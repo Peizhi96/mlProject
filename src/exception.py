@@ -1,5 +1,5 @@
 import sys
-import logging
+from src.logger import logging
 
 def capture_error_details(error, error_detail):
     _, _, exc_tb = error_detail
