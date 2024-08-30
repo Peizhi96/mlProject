@@ -82,7 +82,7 @@ class DataTransformation:
             
             save_object(file_path=self.transformation_config.preprocess_obj_file_path, obj=preprocess_obj)
             
-            return self.transformation_config.preprocess_obj_file_path, train_data_arr, test_data_arr
+            return train_data_arr, test_data_arr, self.transformation_config.preprocess_obj_file_path
         except Exception as e:
             raise CustomException(e, sys.exc_info())
             
