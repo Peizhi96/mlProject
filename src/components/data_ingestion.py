@@ -6,6 +6,8 @@ import pandas as pd
 
 from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
+from src.components.data_transformation import DataTransformation
+from src.components.data_transformation import DataTransformationConfig
 
 @dataclass
 class DataIngestionConfig:
@@ -40,9 +42,12 @@ class DataIngestion:
             
             logging.info("Data ingestion completed successfully.")
             
+            return self.ingestion_config.train_data_path, self.ingestion_config.test_data_path
         except Exception as e:
             raise CustomException(e, sys.exc_info())
         
 if __name__ == '__main__':
-    data_ingestion = DataIngestion()
-    data_ingestion.initiate_data_ingestion()
+    obj = DataIngestion()
+    train_path, test_path = obj.initiate_data_ingestion()
+    data_transformation = DataTransformation()
+    train_arr, test_arr,_ = data_transformation.initiate_data_transformation(train_path, test_path)
