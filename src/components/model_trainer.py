@@ -65,7 +65,5 @@ class ModelTrainer:
 
             return r2_scores
             
-            
-            
         except Exception as e:
             raise CustomException(e, sys.exc_info())
