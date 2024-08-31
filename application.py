@@ -5,7 +5,9 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from src.pipeline.predict_pipeline import PredictPipeline, CustomData
  
-app=Flask(__name__)
+application=Flask(__name__)
+
+app=application
 
 ## Route for a home page
 
@@ -44,4 +46,4 @@ def predict_data():
 
 
 if __name__ == '__main__':
-    app.run(port=5001)
+    app.run(host="0.0.0.0")
