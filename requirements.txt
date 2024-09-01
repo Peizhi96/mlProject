@@ -6,5 +6,15 @@ scikit-learn
 xgboost
 catboost
 flask
+flask-sqlalchemy
+flask-bcrypt
+flask-login
+flask_mail
+python-dotenv
+psycopg2-binary
+google-auth 
+google-auth-oauthlib 
+google-auth-httplib2 
+google-api-python-client
 
 -e .
