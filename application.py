@@ -191,6 +191,7 @@ def index():
 
 
 @app.route('/predictdata', methods=['Get', 'POST'])
+@login_required
 def predict_data():
     if request.method == 'GET':
         return render_template('home.html')
