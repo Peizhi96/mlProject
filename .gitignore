@@ -141,13 +141,14 @@ venv.bak/
 # mkdocs documentation
 /site
 
-# Ignore sensitive credentials file
-credentials.json
+
+
 
 # mypy
 .mypy_cache/
 .dmypy.json
 dmypy.json
+credentials.json
 
 # Pyre type checker
 .pyre/
