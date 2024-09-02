@@ -10,6 +10,7 @@ flask-sqlalchemy
 flask-bcrypt
 flask-login
 flask_mail
+flask-migrate
 python-dotenv
 psycopg2-binary
 google-auth 

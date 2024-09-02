@@ -2,10 +2,12 @@ from __future__ import print_function
 
 from flask import Flask, request, render_template, redirect, url_for, flash, current_app
 from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from dotenv import load_dotenv
 from itsdangerous import URLSafeTimedSerializer
+from flask_migrate import Migrate
 
 
 import os.path
@@ -27,7 +29,7 @@ load_dotenv()
  
 application=Flask(__name__)
 
-app=application
+app = application
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')# change it later
@@ -52,11 +54,43 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
+    
+class UserToken(db.Model):
+    __tablename__ = 'user_tokens'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    access_token = db.Column(db.String(500))
+    refresh_token = db.Column(db.String(500))
+    token_uri = db.Column(db.String(255))
+    scopes = db.Column(db.String(500))
+    expiry = db.Column(db.DateTime)
 
 @login_manager.user_loader
 def load_user(user_id):
     with current_app.app_context():
         return db.session.get(User, int(user_id))
+    
+def save_token_to_db(user, creds):
+    token_record = UserToken.query.filter_by(user_id=user.id).first()
+
+    if not token_record:
+        token_record = UserToken(
+            user_id=user.id,
+            access_token=creds.token,
+            refresh_token=creds.refresh_token,
+            token_uri=creds.token_uri,
+            scopes=",".join(creds.scopes),
+            expiry=creds.expiry
+        )
+        db.session.add(token_record)
+    else:
+        token_record.access_token = creds.token
+        token_record.refresh_token = creds.refresh_token
+        token_record.token_uri = creds.token_uri
+        token_record.scopes = ",".join(creds.scopes)
+        token_record.expiry = creds.expiry
+    
+    db.session.commit()
 
 # route for a register page
 @app.route('/register', methods=['GET', 'POST'])
@@ -144,10 +178,20 @@ def reset_token(token):
 
 def send_email_via_gmail(user):
 
-    creds = None
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-    
+    token_record = UserToken.query.filter_by(user_id=user.id).first()
+
+    if token_record:
+        creds = Credentials(
+            token=token_record.access_token,
+            refresh_token=token_record.refresh_token,
+            token_uri=token_record.token_uri,
+            client_id='your-client-id',
+            client_secret='your-client-secret',
+            scopes=token_record.scopes.split(',')
+        )
+    else:
+        creds = None
+
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
