@@ -1,10 +1,10 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:us-east-2:533267050896:task-definition/studentPerformance:1",
+    "taskDefinitionArn": "arn:aws:ecs:us-east-2:533267050896:task-definition/studentPerformance:3",
     "containerDefinitions": [
         {
             "name": "studentperformance",
             "image": "533267050896.dkr.ecr.us-east-2.amazonaws.com/studentperformance",
-            "cpu": 0,
+            "cpu": 1024,
             "portMappings": [
                 {
                     "name": "studentperformance-80-tcp",
@@ -15,7 +15,12 @@
                 }
             ],
             "essential": true,
-            "environment": [],
+            "environment": [
+                {
+                    "name": "SQLALCHEMY_DATABASE_URI",
+                    "value": "postgresql://postgres@localhost/user_management"
+                }
+            ],
             "environmentFiles": [],
             "mountPoints": [],
             "volumesFrom": [],
@@ -38,7 +43,7 @@
     "family": "studentPerformance",
     "executionRoleArn": "arn:aws:iam::533267050896:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 1,
+    "revision": 3,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -84,7 +89,7 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2024-09-15T17:30:24.842Z",
+    "registeredAt": "2024-09-15T23:49:48.006Z",
     "registeredBy": "arn:aws:iam::533267050896:root",
     "tags": []
 }
