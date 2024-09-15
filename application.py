@@ -2,7 +2,6 @@ from __future__ import print_function
 
 from flask import Flask, request, render_template, redirect, url_for, flash, current_app
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from dotenv import load_dotenv
@@ -36,6 +35,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -106,7 +106,7 @@ def register():
             flash('Username already exists!', category='error')
             return redirect(url_for('register'))
 
-        # create a new user
+        # create a new user and save it to the database
         user = User(username=username, email=email, password=bcrypt.generate_password_hash(password).decode('utf-8'))
         db.session.add(user)
         db.session.commit()
@@ -199,10 +199,7 @@ def send_email_via_gmail(user):
             flow = InstalledAppFlow.from_client_secrets_file(
                 'credentials.json', SCOPES)  
             creds = flow.run_local_server(port=5002)
-
-        with open('token.json', 'w') as token:
-            token.write(creds.to_json())
-   
+            save_token_to_db(user, creds)
     try:
         service = build('gmail', 'v1', credentials=creds)
         token = s.dumps(user.email, salt='password-reset-salt')
